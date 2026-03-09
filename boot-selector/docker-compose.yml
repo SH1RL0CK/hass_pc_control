@@ -5,13 +5,16 @@ services:
     restart: unless-stopped
     network_mode: host
     environment:
-      - HOMEASSISTANT_HOST=${HOMEASSISTANT_HOST}
+      - MQTT_HOST=${MQTT_HOST}
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - TOPIC_LINUX_SET=${TOPIC_LINUX_SET:-pc/linux/set}
+      - TOPIC_WINDOWS_SET=${TOPIC_WINDOWS_SET:-pc/windows/set}
       - TFTP_DIR=/tftp
       - GRUB_LINUX_ENTRY=${GRUB_LINUX_ENTRY:-0}
       - GRUB_WINDOWS_ENTRY=${GRUB_WINDOWS_ENTRY:-2}
       - GRUB_TIMEOUT=${GRUB_TIMEOUT:-3}
+      - GRUB_DEFAULT_BOOT=${GRUB_DEFAULT_BOOT:-linux}
     volumes:
       - tftp_data:/tftp
 

@@ -7,7 +7,7 @@ exec tail -n +3 $0
 # This GRUB script loads a boot config via TFTP from the boot-selector server.
 # It allows Home Assistant to remotely choose which OS to boot.
 #
-# Install: sudo cp 40_custom /etc/grub.d/40_custom && sudo update-grub
+# Install: sudo cp 40_custom /etc/grub.d/40_custom && sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 insmod net
 insmod efinet

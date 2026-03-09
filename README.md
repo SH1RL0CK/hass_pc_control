@@ -54,14 +54,17 @@ docker compose up -d --build
 
 ### Environment Variables
 
-| Variable             | Description                           | Default |
-| -------------------- | ------------------------------------- | ------- |
-| `HOMEASSISTANT_HOST` | MQTT broker IP / hostname             | –       |
-| `MQTT_USERNAME`      | MQTT username                         | –       |
-| `MQTT_PASSWORD`      | MQTT password                         | –       |
-| `GRUB_LINUX_ENTRY`   | GRUB menu index for Linux (0-based)   | `0`     |
-| `GRUB_WINDOWS_ENTRY` | GRUB menu index for Windows (0-based) | `2`     |
-| `GRUB_TIMEOUT`       | GRUB timeout in seconds               | `3`     |
+| Variable             | Description                           | Default          |
+| -------------------- | ------------------------------------- | ---------------- |
+| `MQTT_HOST`          | MQTT broker IP / hostname             | –                |
+| `MQTT_USERNAME`      | MQTT username                         | –                |
+| `MQTT_PASSWORD`      | MQTT password                         | –                |
+| `TOPIC_LINUX_SET`    | MQTT topic for Linux switch           | `pc/linux/set`   |
+| `TOPIC_WINDOWS_SET`  | MQTT topic for Windows switch         | `pc/windows/set` |
+| `GRUB_LINUX_ENTRY`   | GRUB menu index for Linux (0-based)   | `0`              |
+| `GRUB_WINDOWS_ENTRY` | GRUB menu index for Windows (0-based) | `2`              |
+| `GRUB_TIMEOUT`       | GRUB timeout in seconds               | `3`              |
+| `GRUB_DEFAULT_BOOT`  | Default boot target on startup        | `linux`          |
 
 > **Tip:** Find your GRUB entry indices with `awk -F\' '/menuentry / {print NR-1, $2}' /boot/grub/grub.cfg`
 
@@ -104,11 +107,19 @@ copy .env.example .env
 
 ### Environment Variables
 
-| Variable             | Description               |
-| -------------------- | ------------------------- |
-| `HOMEASSISTANT_HOST` | MQTT broker IP / hostname |
-| `MQTT_USERNAME`      | MQTT username             |
-| `MQTT_PASSWORD`      | MQTT password             |
+| Variable             | Description                   | Default                |
+| -------------------- | ----------------------------- | ---------------------- |
+| `MQTT_HOST`          | MQTT broker IP / hostname     | –                      |
+| `MQTT_USERNAME`      | MQTT username                 | –                      |
+| `MQTT_PASSWORD`      | MQTT password                 | –                      |
+| `TOPIC_LINUX_SET`    | MQTT topic for Linux switch   | `pc/linux/set`         |
+| `TOPIC_LINUX_GET`    | MQTT topic for Linux state    | `pc/linux/get`         |
+| `TOPIC_WINDOWS_SET`  | MQTT topic for Windows switch | `pc/windows/set`       |
+| `TOPIC_WINDOWS_GET`  | MQTT topic for Windows state  | `pc/windows/get`       |
+| `TOPIC_INFO`         | MQTT topic for PC usage data  | `pc/info/get`          |
+| `TOPIC_AVAILABILITY` | MQTT topic for availability   | `pc/info/availability` |
+| `PC_DATA_INTERVAL`   | Seconds between usage updates | `5`                    |
+| `RECONNECT_DELAY`    | Seconds before MQTT reconnect | `1`                    |
 
 ### MQTT Topics
 
@@ -132,7 +143,7 @@ The file [`grub/40_custom`](grub/40_custom) is installed on the dual-boot PC. It
 ```bash
 sudo cp grub/40_custom /etc/grub.d/40_custom
 sudo chmod +x /etc/grub.d/40_custom
-sudo update-grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
 ### Configuration
