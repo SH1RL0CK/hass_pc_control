@@ -1,0 +1,16 @@
+#!/bin/sh
+exec tail -n +3 $0
+# This file provides an easy way to add custom menu entries. Simply type the
+# menu entries you want to add after this comment. Be careful not to change
+# the 'exec tail' line above.
+#
+# This GRUB script loads a boot config via TFTP from the boot-selector server.
+# It allows Home Assistant to remotely choose which OS to boot.
+#
+# Install: sudo cp 40_custom /etc/grub.d/40_custom && sudo update-grub
+
+insmod net
+insmod efinet
+insmod tftp
+net_add_addr efinet1:link efinet1 <PC_IP>
+source (tftp,<BOOT_SELECTOR_IP>)/grub_conf

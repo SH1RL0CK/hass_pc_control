@@ -1,0 +1,13 @@
+[Unit]
+Description=PC Agent for Home Assistant (MQTT)
+After=network.target
+
+[Service]
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Type=simple
+User=sh1rl0ck
+WorkingDirectory=/opt/hass_pc_control/pc-agent
+ExecStart=/usr/bin/python3 /opt/hass_pc_control/pc-agent/pc_agent.py
+
+[Install]
+WantedBy=multi-user.target

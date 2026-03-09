@@ -1,0 +1,19 @@
+services:
+  grub-boot-selector:
+    build: .
+    container_name: grub-boot-selector
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - HOMEASSISTANT_HOST=${HOMEASSISTANT_HOST}
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - TFTP_DIR=/tftp
+      - GRUB_LINUX_ENTRY=${GRUB_LINUX_ENTRY:-0}
+      - GRUB_WINDOWS_ENTRY=${GRUB_WINDOWS_ENTRY:-2}
+      - GRUB_TIMEOUT=${GRUB_TIMEOUT:-3}
+    volumes:
+      - tftp_data:/tftp
+
+volumes:
+  tftp_data:
