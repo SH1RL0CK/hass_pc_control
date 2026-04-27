@@ -8,6 +8,7 @@ services:
       - MQTT_HOST=${MQTT_HOST}
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - PC_MAC_ADDRESS=${PC_MAC_ADDRESS}
       - TOPIC_LINUX_SET=${TOPIC_LINUX_SET:-pc/linux/set}
       - TOPIC_WINDOWS_SET=${TOPIC_WINDOWS_SET:-pc/windows/set}
       - TFTP_DIR=/tftp
