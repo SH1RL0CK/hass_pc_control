@@ -4,6 +4,7 @@ import os
 import threading
 
 import tftpy
+import wakeonlan
 from aiomqtt import Client
 from dotenv import load_dotenv
 
@@ -34,6 +35,8 @@ GRUB_TIMEOUT = os.environ.get("GRUB_TIMEOUT", "3")
 GRUB_DEFAULT_BOOT = os.environ.get("GRUB_DEFAULT_BOOT", "linux")
 
 RECONNECT_DELAY = int(os.environ.get("RECONNECT_DELAY", "5"))
+
+PC_MAC_ADDRESS = os.environ.get("PC_MAC_ADDRESS")
 
 PAYLOAD_ON = "ON"
 
@@ -111,6 +114,11 @@ async def main() -> None:
                         target_os = TOPIC_TO_OS.get(topic)
                         if target_os:
                             write_grub_conf(target_os)
+                            if PC_MAC_ADDRESS:
+                                wakeonlan.send_magic_packet(PC_MAC_ADDRESS)
+                                log.info("Wake-on-LAN sent to %s", PC_MAC_ADDRESS)
+                            else:
+                                log.warning("PC_MAC_ADDRESS not set, skipping WoL")
                         else:
                             log.warning("Unknown topic: %s", topic)
 

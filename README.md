@@ -9,8 +9,9 @@ Fully control a dual-boot PC (Linux/Windows) from **Home Assistant** via MQTT �
 │   Home Assistant     │◄────────────────────► │  boot-selector (Docker)  │
 │                      │                       │  • MQTT Listener         │
 │  Switches:           │         MQTT          │  • TFTP Server (:69)     │
-│  - pc/linux/set      │◄──────────────────►   └──────────┬───────────────┘
-│  - pc/windows/set    │                                  │ TFTP
+│  - pc/linux/set      │◄──────────────────►   │  • Wake-on-LAN           │
+│  - pc/windows/set    │                       └──────────┬───────────────┘
+│                      │                                  │ TFTP
 │                      │                                  ▼
 │                      │         MQTT          ┌──────────────────────────┐
 │  Sensors:            │◄────────────────────► │  pc-agent (on the PC)    │
@@ -33,8 +34,8 @@ The project consists of **three components**:
 
 1. **Home Assistant** sends `ON` to `pc/windows/set` (or `pc/linux/set`)
 2. Both **boot-selector** and **pc-agent** receive the message via MQTT
-3. **boot-selector** writes `grub_conf` with the matching GRUB entry
-4. **pc-agent** reboots the PC
+3. **boot-selector** writes `grub_conf` with the matching GRUB entry and sends a **Wake-on-LAN** magic packet to power on the PC
+4. **pc-agent** reboots the PC (if already running)
 5. **GRUB** loads `grub_conf` via TFTP → boots the selected OS
 
 ---
@@ -59,6 +60,7 @@ docker compose up -d --build
 | `MQTT_HOST`          | MQTT broker IP / hostname             | –                |
 | `MQTT_USERNAME`      | MQTT username                         | –                |
 | `MQTT_PASSWORD`      | MQTT password                         | –                |
+| `PC_MAC_ADDRESS`     | MAC address of the PC for Wake-on-LAN | –                |
 | `TOPIC_LINUX_SET`    | MQTT topic for Linux switch           | `pc/linux/set`   |
 | `TOPIC_WINDOWS_SET`  | MQTT topic for Windows switch         | `pc/windows/set` |
 | `GRUB_LINUX_ENTRY`   | GRUB menu index for Linux (0-based)   | `0`              |
@@ -183,7 +185,49 @@ hass_pc_control/
 - **Server:** Docker + Docker Compose, MQTT broker (e.g. Mosquitto in HA)
 - **PC:** Python 3.10+, systemd (Linux) or Task Scheduler (Windows)
 - **Network:** PC and server on the same network, port 69/UDP (TFTP) open
+- **Wake-on-LAN:** WoL must be enabled in the PC's BIOS/UEFI and on the network adapter
 - **GRUB:** EFI network support (`efinet` module)
+
+## Home Assistant Configuration
+
+Add to your `configuration.yaml`:
+
+```yaml
+mqtt:
+  - sensor:
+    - unique_id: pc_cpu_usage
+      name: PC CPU Auslastung
+      unit_of_measurement: "%"
+      availability_topic: pc/info/availability
+      state_topic: pc/info/get
+      icon: mdi:chip
+      value_template: "{{ value_json.cpu }}"
+      expire_after: 10
+    - unique_id: pc_ram_usage
+      name: PC RAM Auslastung
+      unit_of_measurement: "%"
+      availability_topic: pc/info/availability
+      state_topic: pc/info/get
+      icon: mdi:memory
+      value_template: "{{ value_json.memory }}"
+
+  - switch:
+    - unique_id: linux
+      name: Linux
+      state_topic: pc/linux/get
+      command_topic: pc/linux/set
+    - unique_id: windows
+      name: Windows
+      state_topic: pc/windows/get
+      command_topic: pc/windows/set
+    - unique_id: pc_audio_output
+      name: PC Ausgabegerät
+      state_topic: pc/audio_output/get
+      command_topic: pc/audio_output/set
+      availability_topic: pc/info/availability
+```
+
+---
 
 ## License
 

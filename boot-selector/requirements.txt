@@ -1,3 +1,4 @@
 aiomqtt>=2.0.0
 python-dotenv>=1.0.0
 tftpy>=0.8.2
+wakeonlan>=3.0.0
